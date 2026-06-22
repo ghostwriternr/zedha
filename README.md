@@ -10,6 +10,7 @@ Milestone 1 proves the distribution model:
 
 - fetch upstream Zed at the pinned stable release
 - apply Zedha patches in lexical order
+- verify the patched tree is branded as Zedha
 - run targeted terminal launcher tests
 
 Native updates, signed DMGs, notarization, and release publishing are intentionally deferred.
@@ -32,6 +33,7 @@ upstream/stable.json       pinned upstream Zed stable release
 patches/*.patch            ordered downstream patches
 scripts/fetch-upstream     clone pinned upstream source
 scripts/apply-patches      apply patches to a Zed checkout
+scripts/check-identity     verify patched Zedha product identity
 scripts/test               run targeted validation
 tests/test-scripts.sh      script behavior tests
 ```
@@ -54,6 +56,12 @@ Apply Zedha patches:
 
 ```bash
 ./scripts/apply-patches
+```
+
+Verify Zedha identity:
+
+```bash
+./scripts/check-identity
 ```
 
 Run targeted validation:

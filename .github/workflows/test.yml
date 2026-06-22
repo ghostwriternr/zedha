@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check shell syntax
-        run: bash -n scripts/fetch-upstream scripts/apply-patches scripts/test tests/test-scripts.sh
+        run: bash -n scripts/fetch-upstream scripts/apply-patches scripts/check-identity scripts/test tests/test-scripts.sh
       - name: Run script tests
         run: ./tests/test-scripts.sh
 
@@ -32,6 +32,8 @@ jobs:
         run: ./scripts/fetch-upstream
       - name: Apply Zedha patches
         run: ./scripts/apply-patches
+      - name: Check Zedha identity
+        run: ./scripts/check-identity
 
   targeted-tests:
     name: Targeted Zedha tests
@@ -43,5 +45,7 @@ jobs:
         run: ./scripts/fetch-upstream
       - name: Apply Zedha patches
         run: ./scripts/apply-patches
+      - name: Check Zedha identity
+        run: ./scripts/check-identity
       - name: Run targeted Zedha tests
         run: ./scripts/test
