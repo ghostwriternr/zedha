@@ -33,9 +33,10 @@ rm -rf "$checkout_dir"
 mkdir -p "$(dirname "$checkout_dir")"
 
 echo "Fetching upstream Zed $tag ($commit) from $upstream_repo"
-git clone --quiet --no-tags "$upstream_repo" "$checkout_dir"
-git -C "$checkout_dir" fetch --quiet --no-tags origin "$commit"
-git -C "$checkout_dir" checkout --quiet --detach "$commit"
+git init --quiet "$checkout_dir"
+git -C "$checkout_dir" remote add origin "$upstream_repo"
+git -C "$checkout_dir" fetch --quiet --depth 1 --no-tags origin "$commit"
+git -C "$checkout_dir" checkout --quiet --detach FETCH_HEAD
 
 actual=$(git -C "$checkout_dir" rev-parse HEAD)
 if [[ "$actual" != "$commit" ]]; then

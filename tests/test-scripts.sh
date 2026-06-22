@@ -52,6 +52,11 @@ JSON
     echo "expected checkout at $commit, got $actual" >&2
     exit 1
   fi
+
+  if [[ "$(git -C "$checkout" rev-parse --is-shallow-repository)" != "true" ]]; then
+    echo "expected fetch-upstream to create a shallow checkout" >&2
+    exit 1
+  fi
 }
 
 test_apply_patches_applies_patch_files_in_order() {

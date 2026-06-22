@@ -4,6 +4,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -13,12 +17,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: bash -n scripts/fetch-upstream scripts/apply-patches scripts/test tests/test-scripts.sh
       - name: Run script tests
         run: ./tests/test-scripts.sh
 
-  zedha:
-    name: Apply patches and test Zedha
-    runs-on: macos-14
+  patch-apply:
+    name: Apply patches
+    runs-on: ubuntu-latest
+    needs: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch upstream Zed
+        run: ./scripts/fetch-upstream
+      - name: Apply Zedha patches
+        run: ./scripts/apply-patches
+
+  targeted-tests:
+    name: Targeted Zedha tests
+    runs-on: macos-15
+    needs: patch-apply
     steps:
       - uses: actions/checkout@v4
       - name: Fetch upstream Zed
