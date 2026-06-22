@@ -134,52 +134,61 @@ index d222bd1..9311be5 100644
  /// Lowercased form of [`APP_NAME`], for use in XDG-style paths on
  /// Linux/FreeBSD and the macOS `~/.config` fallback.
 diff --git a/crates/release_channel/src/lib.rs b/crates/release_channel/src/lib.rs
-index ca3aff6..ff827cd 100644
+index ca3aff6..efc0d1b 100644
 --- a/crates/release_channel/src/lib.rs
 +++ b/crates/release_channel/src/lib.rs
-@@ -191,7 +191,7 @@ impl ReleaseChannel {
+@@ -185,7 +185,7 @@ impl ReleaseChannel {
+ 
+     /// Returns whether we want to poll for updates for this [`ReleaseChannel`]
+     pub fn poll_for_updates(&self) -> bool {
+-        !matches!(self, ReleaseChannel::Dev)
++        matches!(self, ReleaseChannel::Nightly | ReleaseChannel::Preview)
+     }
+ 
      /// Returns the display name for this [`ReleaseChannel`].
-     pub fn display_name(&self) -> &'static str {
-         match self {
--            ReleaseChannel::Dev => "Zed Dev",
-+            ReleaseChannel::Dev => "Zedha",
+@@ -194,7 +194,7 @@ impl ReleaseChannel {
+             ReleaseChannel::Dev => "Zed Dev",
              ReleaseChannel::Nightly => "Zed Nightly",
              ReleaseChannel::Preview => "Zed Preview",
-             ReleaseChannel::Stable => "Zed",
-@@ -201,7 +201,7 @@ impl ReleaseChannel {
-     /// Returns the programmatic name for this [`ReleaseChannel`].
-     pub fn dev_name(&self) -> &'static str {
-         match self {
--            ReleaseChannel::Dev => "dev",
-+            ReleaseChannel::Dev => "zedha",
+-            ReleaseChannel::Stable => "Zed",
++            ReleaseChannel::Stable => "Zedha",
+         }
+     }
+ 
+@@ -204,7 +204,7 @@ impl ReleaseChannel {
+             ReleaseChannel::Dev => "dev",
              ReleaseChannel::Nightly => "nightly",
              ReleaseChannel::Preview => "preview",
-             ReleaseChannel::Stable => "stable",
-@@ -213,7 +213,7 @@ impl ReleaseChannel {
-     /// This also has to match the bundle identifier for Zed on macOS.
-     pub fn app_id(&self) -> &'static str {
-         match self {
--            ReleaseChannel::Dev => "dev.zed.Zed-Dev",
-+            ReleaseChannel::Dev => "dev.naresh.Zedha",
+-            ReleaseChannel::Stable => "stable",
++            ReleaseChannel::Stable => "zedha",
+         }
+     }
+ 
+@@ -216,7 +216,7 @@ impl ReleaseChannel {
+             ReleaseChannel::Dev => "dev.zed.Zed-Dev",
              ReleaseChannel::Nightly => "dev.zed.Zed-Nightly",
              ReleaseChannel::Preview => "dev.zed.Zed-Preview",
-             ReleaseChannel::Stable => "dev.zed.Zed",
+-            ReleaseChannel::Stable => "dev.zed.Zed",
++            ReleaseChannel::Stable => "me.ghostwriternr.Zedha",
+         }
+     }
+ 
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 4f7ec30..facf956 100644
+index 4f7ec30..2355c10 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
-@@ -275,11 +275,11 @@ repl = { workspace = true, features = ["test-support"] }
+@@ -299,11 +299,11 @@ osx_url_schemes = ["zed"]
  
- [package.metadata.bundle-dev]
- icon = ["resources/app-icon-dev@2x.png", "resources/app-icon-dev.png"]
--identifier = "dev.zed.Zed-Dev"
--name = "Zed Dev"
-+identifier = "dev.naresh.Zedha"
+ [package.metadata.bundle-stable]
+ icon = ["resources/app-icon@2x.png", "resources/app-icon.png"]
+-identifier = "dev.zed.Zed"
+-name = "Zed"
++identifier = "me.ghostwriternr.Zedha"
 +name = "Zedha"
  osx_minimum_system_version = "10.15.7"
  osx_info_plist_exts = ["resources/info/*"]
 -osx_url_schemes = ["zed"]
 +osx_url_schemes = ["zedha"]
  
- [package.metadata.bundle-nightly]
- icon = ["resources/app-icon-nightly@2x.png", "resources/app-icon-nightly.png"]
+ [package.metadata.cargo-machete]
+ ignored = ["profiling", "zstd", "tracing"]

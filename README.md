@@ -10,7 +10,7 @@ Milestone 1 proves the distribution model:
 
 - fetch upstream Zed at the pinned stable release
 - apply Zedha patches in lexical order
-- verify the patched tree is branded as Zedha
+- verify the patched stable-channel tree is branded as Zedha
 - run targeted terminal launcher tests
 
 Native updates, signed DMGs, notarization, and release publishing are intentionally deferred.
@@ -20,7 +20,7 @@ Native updates, signed DMGs, notarization, and release publishing are intentiona
 ```text
 App name:       Zedha
 CLI command:    zedha
-Bundle ID:      dev.naresh.Zedha
+Bundle ID:      me.ghostwriternr.Zedha
 Update channel: zedha
 ```
 
