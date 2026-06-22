@@ -35,6 +35,7 @@ scripts/fetch-upstream     clone pinned upstream source
 scripts/apply-patches      apply patches to a Zed checkout
 scripts/check-identity     verify patched Zedha product identity
 scripts/test               run targeted validation
+scripts/build-macos-artifact build a macOS DMG and copy it to artifacts/
 tests/test-scripts.sh      script behavior tests
 ```
 
@@ -69,6 +70,14 @@ Run targeted validation:
 ```bash
 ./scripts/test
 ```
+
+Build a macOS DMG artifact:
+
+```bash
+./scripts/build-macos-artifact .work/zed aarch64-apple-darwin
+```
+
+The wrapper copies Zed's generated `Zed-aarch64.dmg` to `artifacts/Zedha-aarch64.dmg` for distribution workflow artifacts.
 
 For local development, you can point `fetch-upstream` at an existing Zed checkout:
 

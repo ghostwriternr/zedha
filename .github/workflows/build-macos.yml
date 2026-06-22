@@ -1,0 +1,51 @@
+name: Build macOS Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: macOS target triple
+        required: true
+        default: aarch64-apple-darwin
+        type: choice
+        options:
+          - aarch64-apple-darwin
+          - x86_64-apple-darwin
+      run_tests:
+        description: Run targeted tests before building
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.target }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Zedha DMG
+    runs-on: ${{ inputs.target == 'x86_64-apple-darwin' && 'macos-15-intel' || 'macos-15' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show disk space
+        run: df -h
+      - name: Fetch upstream Zed
+        run: ./scripts/fetch-upstream
+      - name: Apply Zedha patches
+        run: ./scripts/apply-patches
+      - name: Check Zedha identity
+        run: ./scripts/check-identity
+      - name: Run targeted Zedha tests
+        if: ${{ inputs.run_tests }}
+        run: ./scripts/test
+      - name: Build Zedha DMG
+        run: ./scripts/build-macos-artifact .work/zed '${{ inputs.target }}'
+      - name: Upload Zedha DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zedha-${{ inputs.target }}
+          path: artifacts/*.dmg
+          if-no-files-found: error

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+source_dir=${1:-"$repo_root/.work/zed"}
+target_triple=${2:-aarch64-apple-darwin}
+artifact_dir=${ZEDHA_ARTIFACT_DIR:-"$repo_root/artifacts"}
+
+case "$target_triple" in
+  aarch64-apple-darwin)
+    arch_suffix=aarch64
+    ;;
+  x86_64-apple-darwin)
+    arch_suffix=x86_64
+    ;;
+  *)
+    echo "unsupported macOS target: $target_triple" >&2
+    exit 1
+    ;;
+esac
+
+if [[ ! -d "$source_dir" ]]; then
+  echo "source directory not found: $source_dir" >&2
+  exit 1
+fi
+
+if [[ ! -x "$source_dir/script/bundle-mac" ]]; then
+  echo "bundle script not found or not executable: $source_dir/script/bundle-mac" >&2
+  exit 1
+fi
+
+(
+  cd "$source_dir"
+  script/bundle-mac "$target_triple"
+)
+
+source_dmg="$source_dir/target/$target_triple/release/Zed-$arch_suffix.dmg"
+output_dmg="$artifact_dir/Zedha-$arch_suffix.dmg"
+
+if [[ ! -f "$source_dmg" ]]; then
+  echo "expected DMG was not produced: $source_dmg" >&2
+  exit 1
+fi
+
+mkdir -p "$artifact_dir"
+cp "$source_dmg" "$output_dmg"
+
+echo "$output_dmg"

@@ -101,8 +101,25 @@ test_test_script_runs_configured_command_in_source_dir() {
   ZEDHA_TEST_COMMAND='test -f fixture.txt' "$repo_root/scripts/test" "$source"
 }
 
+test_build_macos_artifact_copies_zed_dmg_to_zedha_name() {
+  local source="$test_root/source-for-build"
+  local artifacts="$test_root/artifacts"
+  mkdir -p "$source/script" "$source/target/aarch64-apple-darwin/release"
+  cat > "$source/script/bundle-mac" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'fake dmg\n' > "target/$1/release/Zed-aarch64.dmg"
+SCRIPT
+  chmod +x "$source/script/bundle-mac"
+
+  ZEDHA_ARTIFACT_DIR="$artifacts" "$repo_root/scripts/build-macos-artifact" "$source" aarch64-apple-darwin
+
+  assert_file_contains "$artifacts/Zedha-aarch64.dmg" "fake dmg"
+}
+
 test_fetch_upstream_checks_out_pinned_commit
 test_apply_patches_applies_patch_files_in_order
 test_test_script_runs_configured_command_in_source_dir
+test_build_macos_artifact_copies_zed_dmg_to_zedha_name
 
 echo "All script tests passed"
