@@ -1,0 +1,29 @@
+name: Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    name: Script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run script tests
+        run: ./tests/test-scripts.sh
+
+  zedha:
+    name: Apply patches and test Zedha
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch upstream Zed
+        run: ./scripts/fetch-upstream
+      - name: Apply Zedha patches
+        run: ./scripts/apply-patches
+      - name: Run targeted Zedha tests
+        run: ./scripts/test

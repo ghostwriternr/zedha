@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+source_dir=${1:-"$repo_root/.work/zed"}
+patch_dir=${ZEDHA_PATCH_DIR:-"$repo_root/patches"}
+
+if [[ ! -d "$source_dir/.git" ]]; then
+  echo "source directory is not a git checkout: $source_dir" >&2
+  exit 1
+fi
+
+if [[ ! -d "$patch_dir" ]]; then
+  echo "patch directory not found: $patch_dir" >&2
+  exit 1
+fi
+
+found_patch=0
+for patch in "$patch_dir"/*.patch; do
+  if [[ ! -e "$patch" ]]; then
+    continue
+  fi
+  found_patch=1
+  echo "Applying $(basename "$patch")"
+  if ! git -C "$source_dir" apply --index "$patch"; then
+    echo "failed to apply patch: $patch" >&2
+    echo "reproduce locally with:" >&2
+    echo "  scripts/fetch-upstream $source_dir" >&2
+    echo "  ZEDHA_PATCH_DIR=$patch_dir scripts/apply-patches $source_dir" >&2
+    exit 1
+  fi
+done
+
+if [[ "$found_patch" -eq 0 ]]; then
+  echo "no patches found in $patch_dir" >&2
+  exit 1
+fi
+
+echo "Applied Zedha patches"

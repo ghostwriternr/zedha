@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+checkout_dir=${1:-"$repo_root/.work/zed"}
+upstream_repo=${ZEDHA_UPSTREAM_REPO:-https://github.com/zed-industries/zed.git}
+pin_file=${ZEDHA_UPSTREAM_PIN:-"$repo_root/upstream/stable.json"}
+
+if [[ ! -f "$pin_file" ]]; then
+  echo "upstream pin not found: $pin_file" >&2
+  exit 1
+fi
+
+read_pin_field() {
+  local field=$1
+  python3 - "$pin_file" "$field" <<'PY'
+import json
+import sys
+
+path, field = sys.argv[1], sys.argv[2]
+with open(path, "r", encoding="utf-8") as file:
+    value = json.load(file).get(field)
+if not isinstance(value, str) or not value:
+    raise SystemExit(f"missing string field: {field}")
+print(value)
+PY
+}
+
+tag=$(read_pin_field tag)
+commit=$(read_pin_field commit)
+
+rm -rf "$checkout_dir"
+mkdir -p "$(dirname "$checkout_dir")"
+
+echo "Fetching upstream Zed $tag ($commit) from $upstream_repo"
+git clone --quiet --no-tags "$upstream_repo" "$checkout_dir"
+git -C "$checkout_dir" fetch --quiet --no-tags origin "$commit"
+git -C "$checkout_dir" checkout --quiet --detach "$commit"
+
+actual=$(git -C "$checkout_dir" rev-parse HEAD)
+if [[ "$actual" != "$commit" ]]; then
+  echo "expected checkout at $commit, got $actual" >&2
+  exit 1
+fi
+
+echo "Checked out upstream Zed $tag at $commit"
